@@ -6,11 +6,14 @@ var cellSize = window.innerWidth/cam.w;
 var mousePos;
 var zoom = 1;
 var action = "";
+var gridDrawing = true;
 var actionPoints = new Array();
 var actionElements = new Array();
 var drawCircleWhenCreating = false;
 var pointMoving = false;
 var indexPointMoving = null;
+var elementMoving = false;
+var indexElementMoving = null;
 var p = [
 
 ]
@@ -31,7 +34,9 @@ function draw() {
     background(255);
     translate(width/2,height/2);
     refreshMouse();
-    drawGrid();
+    if(gridDrawing) {
+        drawGrid();
+    }
     drawActionInfo();
     for(var i=0; i<elements.length; i++) {
         elements[i].draw();
@@ -408,22 +413,53 @@ function mouseDragged() {
                 }
             }
         }
-        if(!pointMoving) {
+        if(!elementMoving && !pointMoving) {
+            for(var i=0; i<elements.length; i++) {
+                if((elements[i].mouseOn() || elements[i].active) ) {
+                    elementMoving = true;
+                    indexElementMoving = i;
+                }else{
+                    elements[i].active = false;
+                    $('#'+elements[i].id).removeClass('active')
+                }
+            }
+        }
+        if(!pointMoving && !elementMoving) {
             let previousMousePos = mousePos || {x: mouseX, y: mouseY};
             refreshMouse();
             let depX = -(mousePos.x-previousMousePos.x)/cellSize;
             let depY = (mousePos.y-previousMousePos.y)/cellSize;
             cam.move(depX,depY);
         }else{
-            // Make point move
-            for(var i=0; i<p.length; i++) {
-                if(i != indexPointMoving) {
-                    p[i].active = false;
-                    $('#'+p[i].id).removeClass('active')
+            if(pointMoving) {
+                // Make point move
+                for(var i=0; i<p.length; i++) {
+                    if(i != indexPointMoving) {
+                        p[i].active = false;
+                        $('#'+p[i].id).removeClass('active')
+                    }
+                }
+                p[indexPointMoving].x = convertPosAbsToRel(mouseX,0).x;
+                p[indexPointMoving].y = convertPosAbsToRel(0,mouseY).y;
+            }
+            if(elementMoving) {
+                for(var i=0; i<elements.length; i++) {
+                    if(i != indexElementMoving) {
+                        elements[i].active = false;
+                        $('#'+elements[i].id).removeClass('active')
+                    }
+                }
+                if(elements[indexElementMoving] instanceof LongLine || elements[indexElementMoving] instanceof Line) {
+                    let previousMousePos = mousePos || {x: mouseX, y: mouseY};
+                    refreshMouse();
+                    let depX = -(mousePos.x-previousMousePos.x)/cellSize;
+                    let depY = (mousePos.y-previousMousePos.y)/cellSize;
+                    elements[indexElementMoving].p1.x -= depX;
+                    elements[indexElementMoving].p2.x -= depX;
+                    elements[indexElementMoving].p1.y -= depY;
+                    elements[indexElementMoving].p2.y -= depY;
                 }
             }
-            p[indexPointMoving].x = convertPosAbsToRel(mouseX,0).x;
-            p[indexPointMoving].y = convertPosAbsToRel(0,mouseY).y;
         }
     }
     /* ----------------------------------- */
@@ -435,6 +471,12 @@ function mouseReleased() {
         $('#'+p[indexPointMoving].id).removeClass('active');
         pointMoving = false;
         indexPointMoving = null;
+    }
+    if(elementMoving) {
+        p[indexElementMoving].active = false;
+        $('#'+elements[indexElementMoving].id).removeClass('active');
+        elementMoving = false;
+        indexElementMoving = null;
     }
 }
 
@@ -651,6 +693,6 @@ function roundPosition() {
     }
 }
 
-function interpolation(f,x) {
-    
+function drawGridOrNot() {
+    gridDrawing = !gridDrawing;
 }
