@@ -192,12 +192,12 @@ function mousePressed() {
                                 for(var i=0; i<elements.length; i++) {
                                     elements[i].active = false;
                                 }
-                            case "angle":
-                                if(actionElements.length == 2) {
-                                    if(actionElements[0] instanceof LongLine && actionElements[1] instanceof LongLine) {
-                                        
-                                    }
+                            case "perpendicular":
+                                if(actionElements.length == 1) {
+                                    
+                                    
                                 }
+                                break;
                         }
                     }
                 }else{
@@ -263,6 +263,17 @@ function mousePressed() {
                             }
                             actionPoints = new Array();
                             actionElements = new Array();
+                        }
+                        break;
+                    case "perpendicular":
+                        if(actionElements.length == 1) {
+                            let e = new LongLine(actionElements[0],actionPoints[0]);
+                            addElementList(e.id);
+                            elements.push(e);
+                            actionElements = new Array();
+                            actionPoints = new Array();
+                        }else{
+                            actionPoints = new Array();
                         }
                         break;
                 }
@@ -370,10 +381,7 @@ function mousePressed() {
 }
 
 function newPoint(mouseX,mouseY) {
-    let m = {
-        x: convertPosAbsToRel(mouseX,mouseY).x,
-        y: convertPosAbsToRel(mouseX,mouseY).y
-    }
+    let m = mousePosInRel();
     let newp = new Point(m.x,m.y);
     p.push(newp);
     addElementList(newp.id);
@@ -621,6 +629,27 @@ function drawActionInfo() {
             vertex(mouseX-width/2,mouseY-height/2);
             endShape(CLOSE);
             break;
+        case "perpendicular":
+            if(actionElements.length == 1) {
+                let m = convertPosAbsToRel(mouseX,mouseY);
+                let a = actionElements[0].b;
+                let b = -actionElements[0].a;
+                let c = actionElements[0].a*m.y-actionElements[0].b*m.x;
+                let xLeftCorner = cam.x-cam.w/2;
+                let xRightCorner = cam.x+cam.w/2;
+                let yLeftCorner = -(a*xLeftCorner+c)/b;
+                let yRightCorner = -(a*xRightCorner+c)/b;
+                let c1 = convertPosRelToAbs(xLeftCorner,yLeftCorner);
+                let c2 = convertPosRelToAbs(xRightCorner,yRightCorner);
+                stroke(0);
+                strokeWeight(2);
+                if(this.b != 0) {
+                    line(c1.x,c1.y,c2.x,c2.y);
+                }else{
+                    line(mouseX,-height/2,mouseX,height/2);
+                }
+            }
+            break;
     }
 }
 
@@ -695,4 +724,12 @@ function roundPosition() {
 
 function drawGridOrNot() {
     gridDrawing = !gridDrawing;
+}
+
+function mousePosInRel() {
+    let m = {
+        x: convertPosAbsToRel(mouseX,mouseY).x,
+        y: convertPosAbsToRel(mouseX,mouseY).y
+    }
+    return m;
 }

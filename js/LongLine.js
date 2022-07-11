@@ -10,24 +10,37 @@ class LongLine {
         this.color = generateColor();
         this.id = generateId();
         this.children = new Array();
+        this.perpendicularOf = false;
+        if(this.p1 instanceof LongLine) {
+            this.perpendicularOf = true;
+        }
     }
 
     draw() {
         if(!this.dead) {
+            if(!this.perpendicularOf) {
+                this.a = this.p2.y-this.p1.y;
+                this.b = this.p1.x-this.p2.x;
+                this.c = this.p1.y*(this.p2.x-this.p1.x)+this.p1.x*(this.p1.y-this.p2.y);
+            }else if(this.perpendicularOf) {
+                this.a = this.p1.b;
+                this.b = -this.p1.a;
+                this.c = this.p1.a*this.p2.y-this.p1.b*this.p2.x;
+            }
+            let xLeftCorner = cam.x-cam.w/2;
+            let xRightCorner = cam.x+cam.w/2;
+            let yLeftCorner = -(this.a*xLeftCorner+this.c)/this.b;
+            let yRightCorner = -(this.a*xRightCorner+this.c)/this.b;
+            let c1 = convertPosRelToAbs(xLeftCorner,yLeftCorner);
+            let c2 = convertPosRelToAbs(xRightCorner,yRightCorner);
             let mo = this.mouseOn();
             stroke(this.color.r,this.color.g,this.color.b);
             strokeWeight((mo || this.active ? 4 : 2));
-            let vec = {
-                x: this.p1.x-this.p2.x,
-                y: -(this.p1.y-this.p2.y)
+            if(this.b != 0) {
+                line(c1.x,c1.y,c2.x,c2.y);
+            }else{
+                line(this.p2.x*cellSize,-height/2,this.p2.x*cellSize,height/2);
             }
-            vec.x *= cam.w*cellSize;
-            vec.y *= cam.w*cellSize;
-            let coords = {
-                x: convertPosRelToAbs(this.p1.x,this.p1.y).x,
-                y: convertPosRelToAbs(this.p1.x,this.p1.y).y
-            }
-            line(coords.x-vec.x*1000,coords.y-vec.y*1000,coords.x+vec.x*1000,coords.y+vec.y*1000);
         }
     }
 
@@ -36,9 +49,6 @@ class LongLine {
             x: convertPosAbsToRel(mouseX,mouseY).x,
             y: convertPosAbsToRel(mouseX,mouseY).y
         };
-        this.a = this.p2.y-this.p1.y;
-        this.b = this.p1.x-this.p2.x;
-        this.c = this.p1.y*(this.p2.x-this.p1.x)+this.p1.x*(this.p1.y-this.p2.y);
         let d = abs(this.a*m.x+this.b*m.y+this.c)/(Math.sqrt(this.a*this.a+this.b*this.b));
         return d<0.05;
     }
