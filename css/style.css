@@ -15,12 +15,21 @@ body {
     height: 100%;
 }
 
-.actionHelp {
-    
-
+#actionHelp {
+    z-index: 5;
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    background-color: white;
+    border: 1px solid rgb(210,210,210);
+    transition: 0.2s ease;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-radius: 3px;
+    cursor: help;
 }
-.actionHelp:hover {
-
+#actionHelp:hover {
+    background-color: rgb(230,230,230);
 }
 
 .tools {

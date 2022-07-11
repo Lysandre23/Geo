@@ -6,6 +6,7 @@ var cellSize = window.innerWidth/cam.w;
 var mousePos;
 var zoom = 1;
 var action = "";
+var actionHelpDrawing = true;
 var gridDrawing = true;
 var actionPoints = new Array();
 var actionElements = new Array();
@@ -28,6 +29,7 @@ function setup() {
     var canvas = createCanvas(width,height);
     canvas.parent("listandcanvas");
     textSize(20);
+    turnActionHelp("off");
 }
 
 function draw() { 
@@ -121,6 +123,7 @@ function keyPressed() {
             break;
         case 27: /* ECHAP */
             disableToolsButton();
+            turnActionHelp("off");
             break;
     }
 }
@@ -164,6 +167,10 @@ function mousePressed() {
                                     }
                                     actionElements = new Array();
                                     actionPoints = new Array();
+                                    setTextActionHelp("Select the first line");
+                                }
+                                if(actionElements.length == 1) {
+                                    setTextActionHelp("Select the second line");
                                 }
                                 break;
                             case "integrale":
@@ -192,11 +199,6 @@ function mousePressed() {
                                 for(var i=0; i<elements.length; i++) {
                                     elements[i].active = false;
                                 }
-                            case "perpendicular":
-                                if(actionElements.length == 1) {
-                                    
-                                    
-                                }
                                 break;
                         }
                     }
@@ -220,11 +222,15 @@ function mousePressed() {
                             actionPoints = new Array();
                             actionElements = new Array();
                         }
+                        if(actionPoints.length == 1) {
+                            setTextActionHelp("Select the second point");
+                        }
                         break;
                     case "circle":
                         if(actionPoints.length == 1) {
                             drawCircleWhenCreating = true;
                         }
+                        setTextActionHelp("Set the radius");
                         break;
                     case "longline":
                         if(actionPoints.length == 2) {
@@ -237,6 +243,9 @@ function mousePressed() {
                             actionPoints = new Array();
                             actionElements = new Array();
                         }
+                        if(actionPoints.length == 1) {
+                            setTextActionHelp("Select the second point");
+                        }
                         break;
                     case "polygon":
                         if(actionPoints.length > 2 && actionPoints[0] == actionPoints[actionPoints.length-1]) {
@@ -248,6 +257,8 @@ function mousePressed() {
                             }
                             actionPoints = new Array();
                             actionElements = new Array();
+                        }else{
+                            setTextActionHelp("Add point, select the first point to complete");
                         }
                         break;
                     case "lagrange":
@@ -263,6 +274,8 @@ function mousePressed() {
                             }
                             actionPoints = new Array();
                             actionElements = new Array();
+                        }else{
+                            setTextActionHelp("Add point, select the first point to complete");
                         }
                         break;
                     case "perpendicular":
@@ -273,6 +286,7 @@ function mousePressed() {
                             actionElements = new Array();
                             actionPoints = new Array();
                         }else{
+                            setTextActionHelp("Select a point");
                             actionPoints = new Array();
                         }
                         break;
@@ -316,6 +330,7 @@ function mousePressed() {
                         if(actionPoints.length == 0) {
                             newPoint(mouseX,mouseY);
                             actionPoints.push(p[p.length-1]);
+                            setTextActionHelp("Select the second point");
                         }else if(actionPoints.length == 1) {
                             newPoint(mouseX,mouseY);
                             actionPoints.push(p[p.length-1]);
@@ -325,6 +340,7 @@ function mousePressed() {
                             }
                             elements.push(e);
                             addElementList(e.id);
+                            setTextActionHelp("Select the first point");
                             actionPoints = new Array();
                             actionElements = new Array();
                         }
@@ -333,6 +349,7 @@ function mousePressed() {
                         if(actionPoints.length == 0) {
                             newPoint(mouseX,mouseY);
                             actionPoints.push(p[p.length-1]);
+                            setTextActionHelp("Select the second point");
                         }else if(actionPoints.length == 1) {
                             newPoint(mouseX,mouseY);
                             actionPoints.push(p[p.length-1]);
@@ -344,15 +361,18 @@ function mousePressed() {
                             addElementList(e.id);
                             actionPoints = new Array();
                             actionElements = new Array();
+                            setTextActionHelp("Select the first point");
                         }
                         break;
                     case "polygon":
                         newPoint(mouseX,mouseY);
                         actionPoints.push(p[p.length-1]);
+                        setTextActionHelp("Add point, select the first point to complete");
                         break;
                     case "lagrange":
                         newPoint(mouseX,mouseY);
                         actionPoints.push(p[p.length-1]);
+                        setTextActionHelp("Add point, select the first point to complete");
                 }
 
                 
@@ -547,8 +567,29 @@ function setAction(param,bt) {
     });
     if(param == action) {
         $(bt).removeClass('active');
+        turnActionHelp("off");
     }else{
         $(bt).addClass('active');
+        turnActionHelp("on");
+        switch(param) {
+            case "point":
+                turnActionHelp("off");
+                break;
+            case "line":
+                setTextActionHelp("Select the first point");
+                break;
+            case "longline":
+                setTextActionHelp("Select the first point");
+                break;
+            case "lagrange":
+                setTextActionHelp("Add point, select the first point to complete");
+                break;
+            case "polygon":
+                setTextActionHelp("Add point, select the first point to complete");
+                break;
+            case "inter":
+                setTextActionHelp("Select the first line");
+        }
     }
     action = (action != param ? param : "");
     actionPoints = new Array();
@@ -732,4 +773,31 @@ function mousePosInRel() {
         y: convertPosAbsToRel(mouseX,mouseY).y
     }
     return m;
+}
+
+function setTextActionHelp(t) {
+    $('#actionHelp').children('p').text(t);
+}
+
+function turnActionHelp(param) {
+    if(actionHelpDrawing) {
+        switch(param) {
+            case "on":
+                $("#actionHelp").show();
+                break;
+            case "off":
+                $("#actionHelp").hide();
+        }
+    }else{
+        $("#actionHelp").hide();
+    }
+}
+
+function drawActionHelpOrNot() {
+    actionHelpDrawing = !actionHelpDrawing;
+    if(actionHelpDrawing) {
+        $("#actionHelp").show();
+    }else{
+        $("#actionHelp").hide();
+    }
 }
