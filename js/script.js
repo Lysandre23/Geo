@@ -6,7 +6,8 @@ var cellSize = window.innerWidth/cam.w;
 var mousePos;
 var zoom = 1;
 var action = "";
-var actionHelpDrawing = true;
+var dragging = false;
+var actionHelpDrawing = false;
 var gridDrawing = true;
 var actionPoints = new Array();
 var actionElements = new Array();
@@ -94,40 +95,6 @@ function drawGrid() {
     }
 }
 
-function keyPressed() {
-    switch(keyCode) {
-        case 8: /* DELETE */
-            for(var i=0; i<p.length; i++) {
-                if(p[i].mouseOn() || p[i].active) {
-                    for(var j=0; j<p[i].children.length; j++) {
-                        p[i].children[j].dead = true;
-                        $("#"+p[i].children[j].id).remove();
-                    }
-                    $('#'+p[i].id).remove();
-                    p.splice(i,1);
-                }
-            }
-            for(var i=0; i<elements.length; i++) {
-                if(elements[i].mouseOn() || elements[i].active) {
-                    elements[i].dead = true;
-                    if(elements[i] instanceof Polynomial) {
-                        elements[i].die(); // Affects all generations
-                    }
-                    $('#'+elements[i].id).remove();
-                    for(var j=0; j<elements[i].children.length; j++) {
-                        elements[i].children[j].dead = true;
-                        $("#"+elements[i].children[j].id).remove();
-                    }
-                }
-            }
-            break;
-        case 27: /* ECHAP */
-            disableToolsButton();
-            turnActionHelp("off");
-            break;
-    }
-}
-
 function newPoint(mouseX,mouseY) {
     let m = mousePosInRel();
     let newp = new Point(m.x,m.y);
@@ -135,143 +102,11 @@ function newPoint(mouseX,mouseY) {
     addElementList(newp.id);
 }
 
-function mouseWheel(event) {
-    if(mouseX > 0 && mouseX < width && mouseY > 0 && mouseY < height) {
-        if(event.delta < 0) {
-            cam.w += 0.3;
-        }
-        if(event.delta > 0 && cam.w > 0.15) {
-            cam.w -= 0.3;
-        }
-        cam.h = cam.w*height/width;
-        if(cam.w > 5) {
-            zoom = 1;
-        }else if(cam.w > 2) {
-            zoom = 2;
-        }else {
-            zoom = 4;
-        }
-        refreshCellSize();
-    }
-}
-
-function mouseDragged() {
-    /* ---------- Camera moving ---------- */
-    if(mouseIn()) {
-        if(!pointMoving) {
-            for(var i=0; i<p.length; i++) {
-                if((p[i].mouseOn() || p[i].active) ) {
-                    pointMoving = true;
-                    indexPointMoving = i;
-                }else{
-                    p[i].active = false;
-                    $('#'+p[i].id).removeClass('active')
-                }
-            }
-        }
-        if(!elementMoving && !pointMoving) {
-            for(var i=0; i<elements.length; i++) {
-                if((elements[i].mouseOn() || elements[i].active) ) {
-                    elementMoving = true;
-                    indexElementMoving = i;
-                }else{
-                    elements[i].active = false;
-                    $('#'+elements[i].id).removeClass('active')
-                }
-            }
-        }
-        if(!pointMoving && !elementMoving) {
-            let previousMousePos = mousePos || {x: mouseX, y: mouseY};
-            refreshMouse();
-            let depX = -(mousePos.x-previousMousePos.x)/cellSize;
-            let depY = (mousePos.y-previousMousePos.y)/cellSize;
-            cam.move(depX,depY);
-        }else{
-            if(pointMoving) {
-                // Make point move
-                for(var i=0; i<p.length; i++) {
-                    if(i != indexPointMoving) {
-                        p[i].active = false;
-                        $('#'+p[i].id).removeClass('active')
-                    }
-                }
-                p[indexPointMoving].x = convertPosAbsToRel(mouseX,0).x;
-                p[indexPointMoving].y = convertPosAbsToRel(0,mouseY).y;
-            }
-            if(elementMoving) {
-                for(var i=0; i<elements.length; i++) {
-                    if(i != indexElementMoving) {
-                        elements[i].active = false;
-                        $('#'+elements[i].id).removeClass('active')
-                    }
-                }
-                if(elements[indexElementMoving] instanceof LongLine || elements[indexElementMoving] instanceof Line) {
-                    let previousMousePos = mousePos || {x: mouseX, y: mouseY};
-                    refreshMouse();
-                    let depX = -(mousePos.x-previousMousePos.x)/cellSize;
-                    let depY = (mousePos.y-previousMousePos.y)/cellSize;
-                    elements[indexElementMoving].p1.x -= depX;
-                    elements[indexElementMoving].p2.x -= depX;
-                    elements[indexElementMoving].p1.y -= depY;
-                    elements[indexElementMoving].p2.y -= depY;
-                }
-            }
-        }
-    }
-    /* ----------------------------------- */
-}
-
-function mouseReleased() {
-    if(pointMoving) {
-        p[indexPointMoving].active = false;
-        $('#'+p[indexPointMoving].id).removeClass('active');
-        pointMoving = false;
-        indexPointMoving = null;
-    }
-    if(elementMoving) {
-        p[indexElementMoving].active = false;
-        $('#'+elements[indexElementMoving].id).removeClass('active');
-        elementMoving = false;
-        indexElementMoving = null;
-    }
-}
-
-function refreshMouse() {
-    mousePos = {
-        x: mouseX,
-        y: mouseY
-    }
-}
 
 function refreshCellSize() {
     cellSize = window.innerWidth/cam.w;
 }
 
-function doubleClicked() {
-    let onAPoint = 0;
-    for(var i=0; i<p.length; i++) {
-        if(p[i].mouseOn()) {
-            onAPoint = p[i];
-        }
-    }
-    if(onAPoint != 0) {
-        let s = prompt("x;y").split(";");
-        onAPoint.x = s[0];
-        onAPoint.y = s[1];
-    }else{
-        for(var i=0; i<elements.length; i++) {
-            if(elements[i].mouseOn()) {
-                if(elements[i] instanceof Circle) {
-                    let s = prompt("r=? or d=?");
-                    let t = (s[0] == 'r' ? 'r' : 'd');
-                    s = s.slice(2);
-                    elements[i].d = (t == 'd' ? s : 2*s);
-                }
-            }
-        }
-    }
-    
-}
 
 function newPolynomial() {
     let c = new Array();
@@ -289,4 +124,24 @@ function newPolynomial() {
     addElementList(e.id);
     elements.push(e);
     nbPolynomials++;
+}
+
+function lastPoint() {
+    return p[p.length-1];
+}
+
+function resetActionArray() {
+    actionPoints = new Array();
+    actionElements = new Array();
+}
+
+function addChildrenToPoint(e) {
+    for(var i=0; i<actionPoints.length; i++) {
+        actionPoints[i].children.push(e);
+    }
+}
+function addChildrenToElement(e) {
+    for(var i=0; i<actionElements.length; i++) {
+        actionElements[i].children.push(e);
+    }
 }

@@ -47,3 +47,7 @@ function disableToolsButton() {
         $(this).removeClass('active');
     });
 }
+
+function deletePointList(e) {
+    $("#"+e.id).remove();
+}
