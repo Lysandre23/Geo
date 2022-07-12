@@ -11,7 +11,6 @@ var actionHelpDrawing = false;
 var gridDrawing = true;
 var actionPoints = new Array();
 var actionElements = new Array();
-var drawCircleWhenCreating = false;
 var pointMoving = false;
 var indexPointMoving = null;
 var elementMoving = false;

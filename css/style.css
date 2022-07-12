@@ -72,10 +72,16 @@ body {
 }
 
 .toolsButton:hover {
-    background-color: #b71540;
-    color: white;
+    /*background-color: #b71540;
+    color: white;*/
     cursor: pointer;
     transition: 0.2s ease-in;
+}
+
+.imgTools {
+    width: 25px;
+    height: 25px;
+    border-radius: 5px;
 }
 
 #listandcanvas {
@@ -153,7 +159,7 @@ body {
 }
 
 .active {
-    background-color: #b71540;
+    background-color: rgb(230,230,230);
     color: white;
     cursor: pointer;
     transition: 0.2s ease-in;
