@@ -90,7 +90,7 @@ function mousePressed() {
                 case "lagrange":
                     if(actionPoints.length > 1 && actionPoints[actionPoints.length-1] == actionPoints[0]) {
                         actionPoints = actionPoints.splice(0,actionPoints.length-1);
-                        let e = new Polynomial(Lagrange(actionPoints),actionPoints);
+                        let e = new Polynomial("points",actionPoints);
                         elements.push(e);
                         addElementList(e.id);
                         nbPolynomials++;
@@ -118,7 +118,7 @@ function mousePressed() {
                     break;
                 case "integrale":
                     if(actionElements[0] instanceof Polynomial) {
-                        let e = new Polynomial(actionElements[0],"integrale");
+                        let e = new Polynomial("integrale",actionElements[0]);
                         elements.push(e);
                         addElementList(e.id);
                         addChildrenToElement(e);
@@ -129,14 +129,19 @@ function mousePressed() {
                     break;
                 case "derivate":
                     if(actionElements[0] instanceof Polynomial) {
-                        let e = new Polynomial(actionElements[0],"derivate");
+                        let e = new Polynomial("derivate",actionElements[0]);
                         elements.push(e);
                         addElementList(e.id);
                         addChildrenToElement(e);
-                        resetActionArray(); 
-                    }else{
-                        resetActionArray();
+                        
+                    }else if(actionElements[0] instanceof Function) {
+                        let expr = math.derivative(actionElements[0].expr,'x');
+                        let e = new Function(expr);
+                        elements.push(e);
+                        addElementList(e.id);
+                        addChildrenToElement(e);
                     }
+                    resetActionArray();
                     break;
                 case "circle":
                     if(actionPoints.length == 2) {

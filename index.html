@@ -2,6 +2,7 @@
 <html>
     <head>
         <script src="js/Lagrange.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/10.6.4/math.js" integrity="sha512-BbVEDjbqdN3Eow8+empLMrJlxXRj5nEitiCAK5A1pUr66+jLVejo3PmjIaucRnjlB0P9R3rBUs3g5jXc8ti+fQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" integrity="sha512-894YE6QWD5I59HgZOGReFYm4dnWc1Qt5NtvYSaNcOP+u1T9qYdvdihz0PPSiiqn/+/3e7Jo4EaG7TubfWGUrMQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js" integrity="sha512-NxocnqsXP3zm0Xb42zqVMvjQIktKEpTIbCXXyhBPxqGZHqhcOXHs4pXI/GoZ8lE+2NJONRifuBpi9DxC58L0Lw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="js/Camera.js"></script>
@@ -12,6 +13,7 @@
         <script src="js/Polygon.js"></script>
         <script src="js/Intersection.js"></script>
         <script src="js/Polynomial.js"></script>
+        <script src="js/Function.js"></script>
         <script src="js/Angle.js"></script>
         <script src="js/actionDrawing.js"></script>
         <script src="js/listGestion.js"></script>
@@ -38,9 +40,10 @@
                     <button class="toolsButton" id="angle" onclick="setAction('angle',this)">Angle</button>
                     -->
                     <button class="toolsButton" id="polynomial" onclick="newPolynomial()"><img class="imgTools" src="assets/courbe.png"></button>
+                    <button class="toolsButton" id="lagrange" onclick="setAction('lagrange',this)"><img class="imgTools" src="assets/lagrange.png"></button>
                     <button class="toolsButton" id="integrale" onclick="setAction('integrale',this)"><img class="imgTools" src="assets/integrale.png"></button>
                     <button class="toolsButton" id="derivate" onclick="setAction('derivate',this)"><img class="imgTools" src="assets/derivate.png"></button>
-                    <button class="toolsButton" id="lagrange" onclick="setAction('lagrange',this)"><img class="imgTools" src="assets/lagrange.png"></button>
+                    <button class="toolsButton" id="function" onclick="newFunction()"><img class="imgTools" src="assets/courbe.png"></button>
                 </div>
                 <div class="">
                     <button class="actionButton" id="roundPosition" onclick="roundPosition()">Round</button>

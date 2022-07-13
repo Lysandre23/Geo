@@ -19,7 +19,7 @@ var p = [
 
 ]
 var elements = [
-
+    
 ];
 var nbPolynomials = 0;
 
@@ -119,10 +119,17 @@ function newPolynomial() {
         c.push(parseFloat(newc));
         i++;
     }
-    let e = new Polynomial(c,"name:" + nbPolynomials);
+    let e = new Polynomial("coeff",c);
     addElementList(e.id);
     elements.push(e);
     nbPolynomials++;
+}
+
+function newFunction() {
+    let expr = prompt("Function expression");
+    let e = new Function(expr);
+    elements.push(e);
+    addElementList(e.id);
 }
 
 function lastPoint() {

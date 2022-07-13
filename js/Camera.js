@@ -1,6 +1,7 @@
 const UIcolor = "#eb2f06";
 const power = ["","","²","³","⁴","⁵","⁶","⁷","⁸","⁹"];
 const colorButtonActive = "rgb(230,230,230)"
+const parser = math.parser();
 
 class Camera {
     constructor() {
